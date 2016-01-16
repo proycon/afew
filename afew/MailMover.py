@@ -65,14 +65,17 @@ class MailMover(Database):
         # identify and move messages
         logging.info("checking mails in '{}'".format(maildir))
         if maildir == 'ROOTINBOX':
-            folder = '""'
+            sourcefolder = '""'
             maildir = ""
         else:
-            folder = maildir
+            sourcefolder = maildir
         to_delete_fnames = []
         for query in rules.keys():
-            destination = '{}/{}/cur/'.format(self.db_path, rules[query])
-            main_query = self.query.format(folder=folder, subquery=query)
+            targetfolder = rules[query]
+            if targetfolder== 'ROOTINBOX':
+                targetfolder= rules[query]
+            destination = '{}/{}/cur/'.format(self.db_path, targetfolder)
+            main_query = self.query.format(folder=sourcefolder, subquery=query)
             logging.debug("query: {}".format(main_query))
             messages = notmuch.Query(self.db, main_query).search_messages()
             for message in messages:
@@ -83,15 +86,13 @@ class MailMover(Database):
                                   if maildir in name]
                 if not to_move_fnames:
                     continue
-                self.__log_move_action(message, maildir, rules[query],
+                self.__log_move_action(message, sourcefolder, targetfolder,
                                        self.dry_run)
                 for fname in to_move_fnames:
                     destfile = self.get_new_name(fname, destination)
                     if self.dry_run:
-                        logging.info(fname + " -> " +destfile )
                         continue
                     try:
-                        logging.info("Moving file: " + fname + " -> " + destfile)
                         shutil.copy2(fname, destfile)
                         to_delete_fnames.append(fname)
                     except shutil.Error as e:
