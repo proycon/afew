@@ -86,10 +86,9 @@ class MailMover(Database):
                                   if maildir in name]
                 if not to_move_fnames:
                     continue
-                destfile = self.get_new_name(fname, destination)
-                self.__log_move_action(message, sourcefolder, fname, targetfolder, destfile,
-                                       self.dry_run)
                 for fname in to_move_fnames:
+                    destfile = self.get_new_name(fname, destination)
+                    self.__log_move_action(message, sourcefolder, fname, targetfolder, destfile, self.dry_run)
                     if self.dry_run:
                         continue
                     try:
