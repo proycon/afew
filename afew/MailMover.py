@@ -86,10 +86,10 @@ class MailMover(Database):
                                   if maildir in name]
                 if not to_move_fnames:
                     continue
-                self.__log_move_action(message, sourcefolder, targetfolder,
+                destfile = self.get_new_name(fname, destination)
+                self.__log_move_action(message, sourcefolder, fname, targetfolder, destfile,
                                        self.dry_run)
                 for fname in to_move_fnames:
-                    destfile = self.get_new_name(fname, destination)
                     if self.dry_run:
                         continue
                     try:
@@ -131,7 +131,7 @@ class MailMover(Database):
             raise SystemExit
 
 
-    def __log_move_action(self, message, source, destination, dry_run):
+    def __log_move_action(self, message, sourcefolder, sourcefile, targetfolder, targetfile, dry_run):
         '''
         Report which mails have been identified for moving.
         '''
@@ -143,6 +143,6 @@ class MailMover(Database):
             prefix = 'I would move mail'
         logging.log(level, prefix)
         logging.log(level, "    {}".format(get_message_summary(message).encode('utf8')))
-        logging.log(level, "from '{}' to '{}'".format(source, destination))
+        logging.log(level, "from '{}' to '{}': {} -> {}".format(sourcefolder, targetfolder, sourcefile, targetfile))
         #logging.debug("rule: '{}' in [{}]".format(tag, message.get_tags()))
 
