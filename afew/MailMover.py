@@ -64,10 +64,15 @@ class MailMover(Database):
         '''
         # identify and move messages
         logging.info("checking mails in '{}'".format(maildir))
+        if maildir == 'ROOTINBOX':
+            folder = '""'
+            maildir = ""
+        else:
+            folder = maildir
         to_delete_fnames = []
         for query in rules.keys():
             destination = '{}/{}/cur/'.format(self.db_path, rules[query])
-            main_query = self.query.format(folder=maildir, subquery=query)
+            main_query = self.query.format(folder=folder, subquery=query)
             logging.debug("query: {}".format(main_query))
             messages = notmuch.Query(self.db, main_query).search_messages()
             for message in messages:
