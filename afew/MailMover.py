@@ -87,6 +87,7 @@ class MailMover(Database):
                                        self.dry_run)
                 for fname in to_move_fnames:
                     if self.dry_run:
+                        logging.info(fname + " -> " + self.get_new_name(fname, destination))
                         continue
                     try:
                         shutil.copy2(fname, self.get_new_name(fname, destination))
