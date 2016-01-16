@@ -86,16 +86,18 @@ class MailMover(Database):
                 self.__log_move_action(message, maildir, rules[query],
                                        self.dry_run)
                 for fname in to_move_fnames:
+                    destfile = self.get_new_name(fname, destination)
                     if self.dry_run:
-                        logging.info(fname + " -> " + self.get_new_name(fname, destination))
+                        logging.info(fname + " -> " +destfile )
                         continue
                     try:
-                        shutil.copy2(fname, self.get_new_name(fname, destination))
+                        logging.info("Moving file: " + fname + " -> " + destfile)
+                        shutil.copy2(fname, destfile)
                         to_delete_fnames.append(fname)
                     except shutil.Error as e:
                         # this is ugly, but shutil does not provide more
                         # finely individuated errors
-                        if str(e).endswith("already exists"):
+                        if str(e).endswith("already exists") or str(e).endswith("same file"):
                             continue
                         else:
                             raise
